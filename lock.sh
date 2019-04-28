@@ -1,13 +1,16 @@
 echo '1>LOCK'
 echo '2>UNLOCK'
-ext=".gpg"
+ext=".nc"
 read ch
 if [ $ch -eq 1 ];
 then
         echo 'ENTER FILE NAME WITH EXTENSION'
         read file
-        gpg -c $file
-#       rm $file
+        mcrypt $file
+        x=$?
+        exit 1
+
+        rm $file
         echo 'FILE LOCKED'
 
         ful="$file$ext"
@@ -20,8 +23,16 @@ then
         echo 'ENTER THE FILE NAME WITH EXTENSION'
         read file
         ful="$file$ext "
-
         hid=".$ful"
+
         mv $hid $ful
-        gpg -d $ful| > $file
+        mcrypt -d $ful
+        x=$?
+        if [ $x -eq 0 ];
+        then
+                rm $ful
+                exit
+        else
+                mv $ful $hid
+        fi
 fi
